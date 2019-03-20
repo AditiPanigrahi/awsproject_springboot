@@ -18,18 +18,20 @@ import com.amazonaws.services.s3.model.S3Object;
 public class ObjectDetectionModelService implements Callable<VideoResultKeyPair> {
 
 	private String file = null;
+	private String bucketName = null;
 
 	private final static Object lock = new Object();
 
-	public ObjectDetectionModelService(String filename) {
+	public ObjectDetectionModelService(String filename, String bucketName) {
 		this.file = filename;
+		this.bucketName = bucketName;
 	}
 
 	// Downloads the video from s3 and return the path
 	private String getVideopath() throws FileNotFoundException, IOException {
 
 		final AmazonS3 s3 = AmazonS3ClientBuilder.defaultClient();
-		String bucketName = GlobalConstants.AWS_S3_VIDEO_NAME;
+		String bucketName = this.bucketName;
 		String key_Name = this.file;
 		S3Object object = null;
 		File file = null;
@@ -73,6 +75,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 				Process process2 = Runtime.getRuntime().exec("./darknet_test.py");
 				process2.waitFor();
 				result = process2.getOutputStream().toString();
+				System.out.println("Ouput : " + result);
 
 				// process = Runtime.getRuntime().exec("rm -rf"+file, null, dir);
 				process1.destroy();
