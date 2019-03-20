@@ -7,10 +7,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.Message;
 
 
 public class VideoService {
@@ -18,6 +22,8 @@ public class VideoService {
 	private static final String FILENAME = "filename=";
 	private static final String FILE_NAME_FROM_HEADER = "Content-Disposition";
 	private static final String VIDEO_URL= "http://206.207.50.7/getvideo";
+	
+	
 	public String getVideo() {
 		String fileName = null;
 		try {

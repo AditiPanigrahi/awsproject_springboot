@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cc.awsproject</groupId>
-	<artifactId>awsproject</artifactId>
+	<artifactId>awsproject_spring</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>awsproject</name>
+	<name>awsproject_Spring_forAppTier</name>
 	<description>AWS PROJECT CC</description>
 
 	<properties>
@@ -33,6 +33,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+     		<groupId>com.amazonaws</groupId>
+    	 	<artifactId>aws-java-sdk</artifactId>
+    		 <version>1.11.327</version>
+   		</dependency>
 	</dependencies>
 
 	<build>
