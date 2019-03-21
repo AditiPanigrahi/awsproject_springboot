@@ -71,7 +71,9 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 		System.out.println("Inside object detection class");
 		synchronized (lock) {
 			try {
-
+				Process process0 = Runtime.getRuntime()
+						.exec("Xvfb :1 & export DISPLAY=:1");
+				process0.waitFor();
 				Process process1 = Runtime.getRuntime()
 						.exec("./darknet detector demo cfg/coco.data cfg/yolov3-tiny.cfg  tiny.weights "
 								+ AbsoluteFilePath + " -dont_show > result");
@@ -82,14 +84,15 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 				File f = new File("./result_label");
 				BufferedInputStream bf = null ;
 				if(f.exists()) {
-					 bf = new BufferedInputStream(new FileInputStream(f));
-						result  = StreamUtils.copyToString(bf, StandardCharsets.UTF_8);
-						System.out.println("Ouput : " + result);
+					bf = new BufferedInputStream(new FileInputStream(f));
+					result  = StreamUtils.copyToString(bf, StandardCharsets.UTF_8);
+					System.out.println("Ouput : " + result);
 				}
 				// process = Runtime.getRuntime().exec("rm -rf"+file, null, dir);
 				process1.destroy();
 				process2.destroy();
 				bf.close();
+				deleteVideoFile(AbsoluteFilePath);
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -104,6 +107,19 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 		// read result from file and return
 		// System.out.println(result);
 		return new VideoResultKeyPair(file, result);
+
+	}
+
+	private void deleteVideoFile(String absoluteFilePath) {
+		File file= new File(absoluteFilePath);
+		if(file.delete()) 
+		{ 
+			System.out.println("File deleted successfully"); 
+		} 
+		else
+		{ 
+			System.out.println("Failed to delete the file"); 
+		} 
 
 	}
 

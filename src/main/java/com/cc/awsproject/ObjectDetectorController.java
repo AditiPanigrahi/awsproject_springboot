@@ -77,8 +77,12 @@ public class ObjectDetectorController {
 	}
 
 	public boolean continuePoll() {
-
-		S3Object toPoll = s3.getObject(this.S3Poll, this.instanceId);
+		S3Object toPoll= null;
+		try {
+		 toPoll = s3.getObject(this.S3Poll, this.instanceId);
+		} catch (AmazonS3Exception e) {
+			System.out.println(e.getMessage());
+		}
 		String doPoll = null;
 		if (toPoll != null) {
 
@@ -138,6 +142,7 @@ public class ObjectDetectorController {
 									try {
 										s3.putObject(S3ResultName, new String(kp.getVideoName()),
 												new String(kp.getVideoResult()));
+										s3.deleteObject(S3VideoName, kp.getVideoName());
 									} catch (AmazonS3Exception e) {
 										e.printStackTrace();
 									}
