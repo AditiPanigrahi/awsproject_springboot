@@ -3,12 +3,16 @@ package com.cc.awsproject;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
+
+import org.springframework.util.StreamUtils;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -55,7 +59,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 
 	@Override
 	public VideoResultKeyPair call() {
-		String result = null;
+		String result = "No Object Detected";
 		String AbsoluteFilePath = null;
 
 		try {
@@ -74,12 +78,18 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 				process1.waitFor();
 				Process process2 = Runtime.getRuntime().exec("./darknet_test.py");
 				process2.waitFor();
-				result = process2.getOutputStream().toString();
-				System.out.println("Ouput : " + result);
 
+				File f = new File("./result_label");
+				BufferedInputStream bf = null ;
+				if(f.exists()) {
+					 bf = new BufferedInputStream(new FileInputStream(f));
+						result  = StreamUtils.copyToString(bf, StandardCharsets.UTF_8);
+						System.out.println("Ouput : " + result);
+				}
 				// process = Runtime.getRuntime().exec("rm -rf"+file, null, dir);
 				process1.destroy();
 				process2.destroy();
+				bf.close();
 
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
