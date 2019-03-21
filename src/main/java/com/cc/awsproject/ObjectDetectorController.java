@@ -78,7 +78,7 @@ public class ObjectDetectorController {
 
 	public boolean continuePoll() {
 
-		S3Object toPoll = s3.getObject(this.S3Poll, "key");
+		S3Object toPoll = s3.getObject(this.S3Poll, this.instanceId);
 		String doPoll = null;
 		if (toPoll != null) {
 
