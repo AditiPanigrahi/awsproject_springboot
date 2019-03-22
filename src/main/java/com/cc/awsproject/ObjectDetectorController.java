@@ -187,6 +187,7 @@ public class ObjectDetectorController {
 
 							try {
 								s3.putObject(S3Name, new String(kp.getVideoName()), new String(kp.getVideoResult()));
+								s3.deleteObject(S3VideoName, kp.getVideoName());
 							} catch (AmazonS3Exception e) {
 								e.printStackTrace();
 							}
