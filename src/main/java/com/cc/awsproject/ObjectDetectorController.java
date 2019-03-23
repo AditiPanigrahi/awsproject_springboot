@@ -76,7 +76,8 @@ public class ObjectDetectorController {
 
 	}
 
-	public boolean continuePoll() {
+	public boolean continuePoll() throws InterruptedException {
+		Thread.sleep(500);
 		S3Object toPoll= null;
 		try {
 		 toPoll = s3.getObject(this.S3Poll, this.instanceId);
@@ -135,13 +136,13 @@ public class ObjectDetectorController {
 							VideoResultKeyPair kp = call.get();
 							System.out.println("Inside done");
 
+							s3.putObject(S3ResultName, new String(kp.getVideoName()),
+									new String(kp.getVideoResult()));
+							
 							new Thread(new Runnable() {
-
 								@Override
 								public void run() {
-									try {
-										s3.putObject(S3ResultName, new String(kp.getVideoName()),
-												new String(kp.getVideoResult()));
+									try {	
 										s3.deleteObject(S3VideoName, kp.getVideoName());
 									} catch (AmazonS3Exception e) {
 										e.printStackTrace();
@@ -151,6 +152,9 @@ public class ObjectDetectorController {
 
 						} catch (InterruptedException | ExecutionException e) {
 							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						catch (AmazonS3Exception e) {
 							e.printStackTrace();
 						}
 						// Execution finished above
@@ -204,8 +208,14 @@ public class ObjectDetectorController {
 			}
 			// Grace shutdown call
 		}
-		Thread.sleep(5000);
+		try {
+			s3.putObject(S3Name, this.instanceId, String.valueOf(currentExecThreads));
+		} catch (AmazonS3Exception e) {
+			e.printStackTrace();
+		}
+		Thread.sleep(500);
 
+		System.out.println("Exited Controller");
 	}
 
 }

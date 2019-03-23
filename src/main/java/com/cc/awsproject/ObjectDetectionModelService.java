@@ -91,7 +91,9 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 				// process = Runtime.getRuntime().exec("rm -rf"+file, null, dir);
 				process1.destroy();
 				process2.destroy();
-				bf.close();
+	
+				if(bf != null)
+					bf.close();
 				deleteVideoFile(AbsoluteFilePath);
 
 			} catch (IOException e) {
