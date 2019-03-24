@@ -68,19 +68,25 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		System.out.println("Inside object detection class");
+	
 		synchronized (lock) {
 			try {
+				System.out.println("AbsoluteFilePath =" + AbsoluteFilePath + "Lock Acquired by " + Thread.currentThread().getId() );
 				Process process0 = Runtime.getRuntime()
 						.exec("Xvfb :1 & export DISPLAY=:1");
 				process0.waitFor();
-				Process process1 = Runtime.getRuntime()
-						.exec("./darknet detector demo cfg/coco.data cfg/yolov3-tiny.cfg  tiny.weights "
-								+ AbsoluteFilePath + " -dont_show > result");
-				process1.waitFor();
+				
+				ProcessBuilder p1 = new ProcessBuilder("./darknet", "detector", "demo", "cfg/coco.data", "cfg/yolov3-tiny.cfg", "tiny.weights", AbsoluteFilePath, "-dont_show");
+				p1.redirectOutput(new File("result"));
+				Process process1 = p1.start();
+				
+				System.out.println("Process 1 result:- " + process1.exitValue());
+				
+				process1.waitFor();			
 				Process process2 = Runtime.getRuntime().exec("./darknet_test.py");
 				process2.waitFor();
-
+				System.out.println("Process 2 result:- " + process2.exitValue());
+				
 				File f = new File("./result_label");
 				BufferedInputStream bf = null ;
 				if(f.exists()) {
@@ -88,10 +94,11 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 					result  = StreamUtils.copyToString(bf, StandardCharsets.UTF_8);
 					System.out.println("Ouput : " + result);
 				}
-				// process = Runtime.getRuntime().exec("rm -rf"+file, null, dir);
+				
 				process1.destroy();
 				process2.destroy();
 	
+				
 				if(bf != null)
 					bf.close();
 				deleteVideoFile(AbsoluteFilePath);
