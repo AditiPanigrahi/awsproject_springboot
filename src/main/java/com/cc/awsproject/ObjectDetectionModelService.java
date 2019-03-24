@@ -73,9 +73,11 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 		synchronized (lock) {
 			try {
 				System.out.println("AbsoluteFilePath =" + AbsoluteFilePath + " Lock Acquired by " + Thread.currentThread().getId() );
-				Process process0 = Runtime.getRuntime()
-						.exec("Xvfb :1 & export DISPLAY=:1");
+				
+				ProcessBuilder p0 = new ProcessBuilder(new String[]{"sh","-c","Xvfb :1 &","export DISPLAY=:1"});
+				Process process0 = p0.start();
 				process0.waitFor();
+				System.out.println("Process 0 result:- " + process0.exitValue());
 				
 				ProcessBuilder p1 = new ProcessBuilder("./darknet", "detector", "demo", "cfg/coco.data", "cfg/yolov3-tiny.cfg", "tiny.weights", AbsoluteFilePath, "-dont_show");
 				p1.redirectOutput(new File("result"));
@@ -96,6 +98,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 					System.out.println("Ouput : " + result);
 				}
 				
+				process0.destroy();
 				process1.destroy();
 				process2.destroy();
 	
