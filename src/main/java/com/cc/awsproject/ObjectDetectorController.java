@@ -82,7 +82,18 @@ public class ObjectDetectorController {
 		try {
 		 toPoll = s3.getObject(this.S3Poll, this.instanceId);
 		} catch (AmazonS3Exception e) {
-			System.out.println(e.getMessage());
+			// This exception can occur when instance is started and does not contain key (instance ID)
+			// So set instance polling to true
+			
+			String error = e.getMessage();
+			if(error.contains("NoSuchKey")) {
+				try {
+					s3.putObject(this.S3Poll, this.instanceId, "true");
+					return true;
+				} catch (AmazonS3Exception ex) {
+					ex.printStackTrace();
+				}	
+			}
 		}
 		String doPoll = null;
 		if (toPoll != null) {
