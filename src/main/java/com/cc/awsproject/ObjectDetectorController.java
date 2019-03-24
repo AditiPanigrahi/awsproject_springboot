@@ -195,13 +195,13 @@ public class ObjectDetectorController {
 
 			for (int i = 0; i < futures.size(); i++) {
 				Future<VideoResultKeyPair> call = futures.get(i);
-				{
+				
 					if (call != null && call.isDone()) {
 						try {
 							VideoResultKeyPair kp = call.get();
 
 							try {
-								s3.putObject(S3Name, new String(kp.getVideoName()), new String(kp.getVideoResult()));
+								s3.putObject(S3ResultName, new String(kp.getVideoName()), new String(kp.getVideoResult()));
 								s3.deleteObject(S3VideoName, kp.getVideoName());
 							} catch (AmazonS3Exception e) {
 								e.printStackTrace();
@@ -215,7 +215,7 @@ public class ObjectDetectorController {
 						futures.set(i, null);
 						currentExecThreads--;
 					}
-				}
+				
 			}
 			// Grace shutdown call
 		}
