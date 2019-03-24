@@ -39,6 +39,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 		String key_Name = this.file;
 		S3Object object = null;
 		File file = null;
+		System.out.println("Video Downloading started for " + key_Name);
 		try {
 			object = s3.getObject(bucketName, key_Name);
 			InputStream reader = new BufferedInputStream(object.getObjectContent());
@@ -71,7 +72,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 	
 		synchronized (lock) {
 			try {
-				System.out.println("AbsoluteFilePath =" + AbsoluteFilePath + "Lock Acquired by " + Thread.currentThread().getId() );
+				System.out.println("AbsoluteFilePath =" + AbsoluteFilePath + " Lock Acquired by " + Thread.currentThread().getId() );
 				Process process0 = Runtime.getRuntime()
 						.exec("Xvfb :1 & export DISPLAY=:1");
 				process0.waitFor();
@@ -79,10 +80,10 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 				ProcessBuilder p1 = new ProcessBuilder("./darknet", "detector", "demo", "cfg/coco.data", "cfg/yolov3-tiny.cfg", "tiny.weights", AbsoluteFilePath, "-dont_show");
 				p1.redirectOutput(new File("result"));
 				Process process1 = p1.start();
-				
+				process1.waitFor();		
+
 				System.out.println("Process 1 result:- " + process1.exitValue());
 				
-				process1.waitFor();			
 				Process process2 = Runtime.getRuntime().exec("./darknet_test.py");
 				process2.waitFor();
 				System.out.println("Process 2 result:- " + process2.exitValue());
@@ -123,7 +124,7 @@ public class ObjectDetectionModelService implements Callable<VideoResultKeyPair>
 		File file= new File(absoluteFilePath);
 		if(file.delete()) 
 		{ 
-			System.out.println("File deleted successfully"); 
+			System.out.println("File " + absoluteFilePath+ " deleted successfully"); 
 		} 
 		else
 		{ 
