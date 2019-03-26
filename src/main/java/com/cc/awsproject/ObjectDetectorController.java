@@ -114,7 +114,7 @@ public class ObjectDetectorController {
 	}
 
 	public void getObject() throws InterruptedException {
-
+		s3.putObject(S3Name, this.instanceId, "-1");
 		while (true) {
 
 			if (continuePoll()) {
@@ -214,16 +214,17 @@ public class ObjectDetectorController {
 
 						futures.set(i, null);
 						currentExecThreads--;
+						try {
+							s3.putObject(S3Name, this.instanceId, String.valueOf(currentExecThreads));
+						} catch (AmazonS3Exception e) {
+							e.printStackTrace();
+						}
 					}
 				
 			}
 			// Grace shutdown call
 		}
-		try {
-			s3.putObject(S3Name, this.instanceId, String.valueOf(currentExecThreads));
-		} catch (AmazonS3Exception e) {
-			e.printStackTrace();
-		}
+		
 		Thread.sleep(500);
 
 		System.out.println("Exited Controller");
